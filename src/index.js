@@ -1,29 +1,27 @@
+import 'whatwg-fetch';
+
 const endpoint = "http://localhost:3000"
 
-const getUser = (userId) => {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest(); // ①
-    const url = `${endpoint}/users/${userId}`; // ②
-    xhr.onload = (e) => {
-      if (xhr.status === 200) {
-        resolve(xhr.response);
-      } else {
-        reject(JSON.parse(xhr.response));
-      }
-    }
-    xhr.open("GET", url, true); // ③
-    xhr.send();
-  });
+const getUser = async (userId) => {
+  const url = `${endpoint}/users/${userId}`;
+  const response = await fetch(url, { method: "get" })
+  const json = response.json();
+  if (response.status === 200) {
+    return Promise.resolve(json);
+  } else {
+    return Promise.reject(json.error);
+  }
 }
 
 {
   getUser(1)
     .then((data) => {
+      console.log(data);
       const p = document.createElement('p')
-      p.innerHTML = data
+      p.innerHTML = `名前: ${data.name}<br/>メールアドレス: ${data.email} `
       document.body.appendChild(p);
     })
     .catch((err) => {
-      console.log(err.error);
+      console.log(err);
     });
 }
